@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Fit With COACH Daniel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-dumbbell"></i> Emmatos Fitness</h3>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active"><a href="#"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+                    <li><a href="#profile"><i class="fas fa-user"></i> <span>Profile</span></a></li>
+                    <li><a href="#workouts"><i class="fas fa-running"></i> <span>Workouts</span></a></li>
+                    <li><a href="#progress"><i class="fas fa-chart-line"></i> <span>Progress</span></a></li>
+                    <li><a href="#nutrition"><i class="fas fa-apple-alt"></i> <span>Nutrition</span></a></li>
+                    <li><a href="#messages"><i class="fas fa-envelope"></i> <span>Messages</span></a></li>
+                    <li><a href="#settings"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="{{ url_for('logout') }}" class="btn btn-secondary">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+        
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="main-header">
+                <div class="header-left">
+                    <h2>Welcome Back, {{ user.name }}! <i class="fas fa-hand-wave"></i></h2>
+                    <p>Track your fitness journey and achieve your goals</p>
+                </div>
+                <div class="header-right">
+                    <div class="user-profile">
+                        <img src="{{ url_for('static', filename='images/default-avatar.jpg') }}" alt="User Avatar" id="userAvatar">
+                        <span>{{ user.email }}</span>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="content-wrapper">
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon bg-primary">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Total Members</h3>
+                            <p>{{ stats.total_users }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon bg-success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Active Members</h3>
+                            <p>{{ stats.verified_users }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon bg-warning">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Pending Members</h3>
+                            <p>{{ stats.unverified_users }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon bg-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Issues</h3>
+                            <p>0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- User Data Table -->
+                <div class="data-section">
+                    <div class="section-header">
+                        <h3><i class="fas fa-user-circle"></i> User Information</h3>
+                        <button class="btn btn-primary btn-sm">
+                            <i class="fas fa-download"></i> Export Data
+                        </button>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
+                                    <th>Joined</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{{ user.id }}</td>
+                                    <td>{{ user.name }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        {% if user.verified %}
+                                            <span class="status-badge status-active">Active</span>
+                                        {% else %}
+                                            <span class="status-badge status-pending">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ user.formatted_created_at }}</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Recent Activity -->
+                <div class="data-section">
+                    <div class="section-header">
+                        <h3><i class="fas fa-history"></i> Recent Activity</h3>
+                    </div>
+                    
+                    <div class="activity-list">
+                        {% for activity in activities %}
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                {% if activity.type == 'account_creation' %}
+                                    <i class="fas fa-user-plus"></i>
+                                {% elif activity.type == 'verification' %}
+                                    <i class="fas fa-envelope-open"></i>
+                                {% else %}
+                                    <i class="fas fa-info-circle"></i>
+                                {% endif %}
+                            </div>
+                            <div class="activity-info">
+                                <p>{{ activity.description }}</p>
+                                <span class="activity-time">{{ activity.date }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Add some interactive elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effect to stat cards
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+
+            // Add smooth scrolling to sidebar links
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = this.getAttribute('href').substring(1);
+                    const element = document.getElementById(target);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+
+            // Add animation to activity items
+            const activityItems = document.querySelectorAll('.activity-item');
+            activityItems.forEach((item, index) => {
+                item.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
+
+    <style>
+        /* Additional inline styles */
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: rgba(46, 204, 113, 0.1);
+            color: #27AE60;
+        }
+
+        .status-pending {
+            background: rgba(241, 196, 15, 0.1);
+            color: #F39C12;
+        }
+
+        .hand-wave {
+            animation: wave 1s infinite;
+            display: inline-block;
+            transform-origin: 70% 70%;
+        }
+
+        @keyframes wave {
+            0% { transform: rotate(0deg); }
+            10% { transform: rotate(14deg); }
+            20% { transform: rotate(-8deg); }
+            30% { transform: rotate(14deg); }
+            40% { transform: rotate(-4deg); }
+            50% { transform: rotate(10deg); }
+            60% { transform: rotate(0deg); }
+            100% { transform: rotate(0deg); }
+        }
+    </style>
+</body>
+</html>

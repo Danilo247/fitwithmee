@@ -1,0 +1,318 @@
+/* Login.css - Unique styling for login page */
+
+:root {
+    --primary-color: #FF6B6B;
+    --secondary-color: #4ECDC4;
+    --accent-color: #FFE66D;
+    --text-color: #2C3E50;
+    --background-color: #F7F9FC;
+    --gradient-start: #FFE5E5;
+    --gradient-end: #FFF0F5;
+    --input-bg: rgba(255, 255, 255, 0.9);
+    --card-bg: rgba(255, 255, 255, 0.95);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+    position: relative;
+}
+
+/* Decorative elements */
+body::before {
+    content: '';
+    position: fixed;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, var(--accent-color) 0%, transparent 70%);
+    top: -200px;
+    right: -100px;
+    border-radius: 50%;
+    opacity: 0.4;
+    animation: float 10s ease-in-out infinite;
+    z-index: -1;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, var(--secondary-color) 0%, transparent 70%);
+    bottom: -150px;
+    left: -100px;
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: float 12s ease-in-out infinite reverse;
+    z-index: -1;
+}
+
+@keyframes float {
+    0% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-30px) rotate(5deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 450px;
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.auth-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    padding: 2.5rem;
+    position: relative;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transform: translateY(0);
+    transition: transform 0.3s ease;
+    overflow: hidden;
+}
+
+.auth-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+    background-size: 200% 100%;
+    animation: gradientMove 3s linear infinite;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 200% 0%; }
+}
+
+.auth-card:hover {
+    transform: translateY(-5px);
+}
+
+.auth-card h2 {
+    color: var(--primary-color);
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    font-weight: 600;
+    position: relative;
+}
+
+.auth-card h2::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 3px;
+    background: var(--accent-color);
+    border-radius: 3px;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #E0E0E0;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: var(--input-bg);
+    padding-left: 3rem;
+}
+
+.form-group input:focus {
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.2);
+    outline: none;
+}
+
+.form-group i {
+    position: absolute;
+    left: 1rem;
+    top: 2.5rem;
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus + i {
+    color: var(--secondary-color);
+    transform: scale(1.1);
+}
+
+.forgot-password {
+    display: block;
+    text-align: right;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    transition: color 0.3s ease;
+}
+
+.forgot-password:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, var(--primary-color), #FF8E8E);
+    color: white;
+    padding: 1rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: all 0.5s ease;
+}
+
+.btn-primary:hover::before {
+    left: 100%;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(45deg, #FF8E8E, var(--primary-color));
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+}
+
+.auth-footer {
+    margin-top: 2rem;
+    text-align: center;
+    color: #666;
+}
+
+.auth-footer a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.auth-footer a:hover {
+    color: var(--secondary-color);
+}
+
+.alert {
+    background: rgba(255, 107, 107, 0.1);
+    border-left: 4px solid var(--primary-color);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Decorative elements */
+.decorative-circle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+    z-index: -1;
+}
+
+.circle-1 {
+    width: 150px;
+    height: 150px;
+    background-color: var(--primary-color);
+    top: 10%;
+    left: 10%;
+    animation: float 15s ease-in-out infinite;
+}
+
+.circle-2 {
+    width: 100px;
+    height: 100px;
+    background-color: var(--secondary-color);
+    bottom: 20%;
+    right: 15%;
+    animation: float 12s ease-in-out infinite reverse;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .auth-card {
+        padding: 2rem;
+    }
+    
+    .auth-card h2 {
+        font-size: 1.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-container {
+        padding: 1rem;
+    }
+    
+    .auth-card {
+        padding: 1.5rem;
+    }
+    
+    .auth-card h2 {
+        font-size: 1.5rem;
+    }
+    
+    .decorative-circle {
+        display: none;
+    }
+} 

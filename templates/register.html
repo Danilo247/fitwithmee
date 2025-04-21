@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Fit With COACH Daniel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='register.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <h2><i class="fas fa-dumbbell"></i> Join Our Fitness Family</h2>
+            
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert">
+                            <i class="fas fa-info-circle"></i> {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <form method="POST" action="{{ url_for('register') }}" class="auth-form" id="registerForm">
+                <div class="form-group">
+                    <label for="name">
+                        <i class="fas fa-user"></i> Full Name
+                    </label>
+                    <input type="text" id="name" name="name" required minlength="2" placeholder="Enter your full name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">
+                        <i class="fas fa-envelope"></i> Email
+                    </label>
+                    <input type="email" id="email" name="email" required 
+                           pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                           placeholder="Enter your email">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <input type="password" id="password" name="password" required 
+                           minlength="8" 
+                           pattern="(?=.*\d)(?=.*[!@#$%^&*(),.?&quot;:{}|&lt;&gt;])[A-Za-z\d!@#$%^&*(),.?&quot;:{}|&lt;&gt;]{8,}"
+                           placeholder="Create a strong password">
+                    <div class="password-strength">
+                        <div class="password-strength-bar"></div>
+                    </div>
+                    <small>
+                        <i class="fas fa-info-circle"></i> 
+                        Password must be at least 8 characters with one number and one special character
+                    </small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword">
+                        <i class="fas fa-lock"></i> Confirm Password
+                    </label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required 
+                           minlength="8" placeholder="Confirm your password">
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" required>
+                        <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></span>
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+            </form>
+            
+            <div class="auth-footer">
+                <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+                <p><a href="{{ url_for('index') }}"><i class="fas fa-home"></i> Back to home</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Password strength indicator
+        const password = document.getElementById('password');
+        const strengthBar = document.querySelector('.password-strength-bar');
+        
+        password.addEventListener('input', function() {
+            const val = password.value;
+            const strength = calculatePasswordStrength(val);
+            updateStrengthBar(strength);
+        });
+
+        function calculatePasswordStrength(password) {
+            let strength = 0;
+            if (password.length >= 8) strength += 25;
+            if (password.match(/[a-z]+/)) strength += 25;
+            if (password.match(/[A-Z]+/)) strength += 25;
+            if (password.match(/[0-9]+/)) strength += 25;
+            return strength;
+        }
+
+        function updateStrengthBar(strength) {
+            strengthBar.style.width = strength + '%';
+            if (strength <= 25) {
+                strengthBar.style.backgroundColor = '#ff4444';
+            } else if (strength <= 50) {
+                strengthBar.style.backgroundColor = '#ffbb33';
+            } else if (strength <= 75) {
+                strengthBar.style.backgroundColor = '#00C851';
+            } else {
+                strengthBar.style.backgroundColor = '#007E33';
+            }
+        }
+
+        // Password confirmation validation
+        const confirmPassword = document.getElementById('confirmPassword');
+        const form = document.getElementById('registerForm');
+
+        form.addEventListener('submit', function(e) {
+            if (password.value !== confirmPassword.value) {
+                e.preventDefault();
+                alert('Passwords do not match!');
+            }
+        });
+    </script>
+</body>
+</html>
