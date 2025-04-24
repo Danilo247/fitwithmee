@@ -5,13 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | Fit With COACH Daniel</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='responsive.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="dashboard-container">
+        <!-- Mobile Navigation Toggle -->
+        <button class="nav-toggle" id="navToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+
         <!-- Sidebar Navigation -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <h3><i class="fas fa-dumbbell"></i> FitWithMe</h3>
             </div>
@@ -119,18 +125,18 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>{{ user.id }}</td>
-                                    <td>{{ user.name }}</td>
-                                    <td>{{ user.email }}</td>
-                                    <td>
+                                    <td data-label="ID">{{ user.id }}</td>
+                                    <td data-label="Name">{{ user.name }}</td>
+                                    <td data-label="Email">{{ user.email }}</td>
+                                    <td data-label="Status">
                                         {% if user.verified %}
                                             <span class="status-badge status-active">Active</span>
                                         {% else %}
                                             <span class="status-badge status-pending">Pending</span>
                                         {% endif %}
                                     </td>
-                                    <td>{{ user.formatted_created_at }}</td>
-                                    <td>
+                                    <td data-label="Joined">{{ user.formatted_created_at }}</td>
+                                    <td data-label="Actions">
                                         <button class="btn btn-primary btn-sm">
                                             <i class="fas fa-edit"></i> Edit
                                         </button>
@@ -173,6 +179,15 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Mobile navigation toggle
+            const navToggle = document.getElementById('navToggle');
+            const sidebar = document.getElementById('sidebar');
+            
+            navToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+                navToggle.classList.toggle('active');
+            });
+
             // Add hover effect to stat cards
             const statCards = document.querySelectorAll('.stat-card');
             statCards.forEach(card => {
@@ -193,6 +208,11 @@
                     if (element) {
                         element.scrollIntoView({ behavior: 'smooth' });
                     }
+                    // Close mobile menu after clicking
+                    if (window.innerWidth < 768) {
+                        sidebar.classList.remove('active');
+                        navToggle.classList.remove('active');
+                    }
                 });
             });
 
@@ -200,6 +220,14 @@
             const activityItems = document.querySelectorAll('.activity-item');
             activityItems.forEach((item, index) => {
                 item.style.animationDelay = `${index * 0.1}s`;
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 768) {
+                    sidebar.classList.remove('active');
+                    navToggle.classList.remove('active');
+                }
             });
         });
     </script>
@@ -238,6 +266,35 @@
             50% { transform: rotate(10deg); }
             60% { transform: rotate(0deg); }
             100% { transform: rotate(0deg); }
+        }
+
+        /* Mobile navigation styles */
+        .nav-toggle {
+            background: none;
+            border: none;
+            color: #2c3e50;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: none;
+        }
+
+        @media (max-width: 767px) {
+            .nav-toggle {
+                display: block;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease-in-out;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .nav-toggle.active i {
+                transform: rotate(90deg);
+            }
         }
     </style>
 </body>
