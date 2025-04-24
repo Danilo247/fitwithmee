@@ -1,0 +1,430 @@
+{% extends "dashboard.html" %}
+
+{% block content %}
+<div class="community-container">
+    <div class="community-header">
+        <h2><i class="fas fa-users"></i> Community</h2>
+        <p>Connect with other fitness enthusiasts and share your journey</p>
+    </div>
+
+    <div class="community-content">
+        <!-- Community Stats -->
+        <div class="community-section">
+            <div class="community-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h4>Total Members</h4>
+                        <p>{{ stats.total_members }}</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h4>Active Today</h4>
+                        <p>{{ stats.active_today }}</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h4>Total Posts</h4>
+                        <p>{{ stats.total_posts }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feed Section -->
+        <div class="community-section">
+            <div class="section-header">
+                <h3><i class="fas fa-newspaper"></i> Community Feed</h3>
+                <button class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create Post
+                </button>
+            </div>
+            
+            <div class="feed-filters">
+                <div class="filter-group">
+                    <button class="btn btn-outline active">All</button>
+                    <button class="btn btn-outline">Workouts</button>
+                    <button class="btn btn-outline">Progress</button>
+                    <button class="btn btn-outline">Nutrition</button>
+                    <button class="btn btn-outline">Questions</button>
+                </div>
+            </div>
+
+            <div class="feed-posts">
+                {% for post in posts %}
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="post-author">
+                            <img src="{{ post.author.avatar }}" alt="{{ post.author.name }}">
+                            <div class="author-info">
+                                <h4>{{ post.author.name }}</h4>
+                                <span class="post-time">{{ post.time }}</span>
+                            </div>
+                        </div>
+                        <div class="post-actions">
+                            <button class="btn btn-icon">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="post-content">
+                        <p>{{ post.content }}</p>
+                        {% if post.image %}
+                        <div class="post-image">
+                            <img src="{{ post.image }}" alt="Post image">
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="post-stats">
+                        <div class="stat">
+                            <i class="fas fa-heart"></i>
+                            <span>{{ post.likes }}</span>
+                        </div>
+                        <div class="stat">
+                            <i class="fas fa-comment"></i>
+                            <span>{{ post.comments }}</span>
+                        </div>
+                        <div class="stat">
+                            <i class="fas fa-share"></i>
+                            <span>{{ post.shares }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="post-comments">
+                        {% for comment in post.comments %}
+                        <div class="comment">
+                            <img src="{{ comment.author.avatar }}" alt="{{ comment.author.name }}">
+                            <div class="comment-content">
+                                <h5>{{ comment.author.name }}</h5>
+                                <p>{{ comment.text }}</p>
+                                <span class="comment-time">{{ comment.time }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Community Members -->
+        <div class="community-section">
+            <div class="section-header">
+                <h3><i class="fas fa-user-friends"></i> Active Members</h3>
+                <button class="btn btn-primary">
+                    <i class="fas fa-search"></i> Find Friends
+                </button>
+            </div>
+            
+            <div class="members-grid">
+                {% for member in active_members %}
+                <div class="member-card">
+                    <div class="member-avatar">
+                        <img src="{{ member.avatar }}" alt="{{ member.name }}">
+                        {% if member.online %}
+                        <span class="online-status"></span>
+                        {% endif %}
+                    </div>
+                    <div class="member-info">
+                        <h4>{{ member.name }}</h4>
+                        <p>{{ member.role }}</p>
+                        <div class="member-stats">
+                            <div class="stat">
+                                <i class="fas fa-fire"></i>
+                                <span>{{ member.workouts }}</span>
+                            </div>
+                            <div class="stat">
+                                <i class="fas fa-trophy"></i>
+                                <span>{{ member.achievements }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-user-plus"></i> Follow
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.community-container {
+    padding: 2rem;
+}
+
+.community-header {
+    margin-bottom: 2rem;
+}
+
+.community-section {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.community-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.stat-card {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    background: #4CAF50;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.stat-info h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.stat-info p {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #343a40;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.feed-filters {
+    margin-bottom: 1.5rem;
+}
+
+.filter-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid #ddd;
+    color: #6c757d;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-outline.active {
+    background: #4CAF50;
+    border-color: #4CAF50;
+    color: white;
+}
+
+.feed-posts {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.post-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.post-author {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.post-author img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.author-info h4 {
+    margin: 0 0 0.25rem 0;
+    color: #343a40;
+}
+
+.post-time {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.post-content {
+    margin-bottom: 1rem;
+}
+
+.post-content p {
+    margin: 0 0 1rem 0;
+    color: #343a40;
+}
+
+.post-image {
+    margin-top: 1rem;
+}
+
+.post-image img {
+    width: 100%;
+    border-radius: 8px;
+}
+
+.post-stats {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-top: 1px solid #e9ecef;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6c757d;
+}
+
+.post-comments {
+    margin-top: 1rem;
+}
+
+.comment {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.comment:last-child {
+    border-bottom: none;
+}
+
+.comment img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.comment-content {
+    flex: 1;
+}
+
+.comment-content h5 {
+    margin: 0 0 0.25rem 0;
+    color: #343a40;
+}
+
+.comment-content p {
+    margin: 0 0 0.25rem 0;
+    color: #343a40;
+}
+
+.comment-time {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+.members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.member-card {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.member-avatar {
+    position: relative;
+    margin: 0 auto 1rem;
+    width: 100px;
+    height: 100px;
+}
+
+.member-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.online-status {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    background: #4CAF50;
+    border: 3px solid white;
+    border-radius: 50%;
+}
+
+.member-info h4 {
+    margin: 0 0 0.25rem 0;
+    color: #343a40;
+}
+
+.member-info p {
+    margin: 0 0 1rem 0;
+    color: #6c757d;
+}
+
+.member-stats {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.member-stats .stat {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6c757d;
+}
+</style>
+{% endblock %} 

@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-wrapper">
+    <div class="auth-container">
+        <div class="auth-box">
+            <div class="auth-header">
+                <i class="fas fa-shield-alt"></i>
+                <h1>Verify Your Email</h1>
+                <p class="auth-subtitle">Please enter the 8-digit verification code sent to your email</p>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" class="auth-form" id="otpForm">
+                <input type="hidden" name="token" id="fullToken">
+                <div class="otp-inputs">
+                    {% for i in range(8) %}
+                    <input type="text" class="otp-input" maxlength="1" required pattern="[0-9]" inputmode="numeric">
+                    {% endfor %}
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-check"></i> Verify Email
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Didn't receive the code? <a href="{{ url_for('resend_verification') }}">Resend verification code</a></p>
+                <p><a href="{{ url_for('login') }}">Back to Login</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 20px;
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 400px;
+}
+
+.auth-box {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-header i {
+    font-size: 3rem;
+    color: #4CAF50;
+    margin-bottom: 1rem;
+}
+
+.auth-header h1 {
+    font-size: 1.5rem;
+    color: #333;
+    margin: 0 0 0.5rem 0;
+}
+
+.auth-subtitle {
+    color: #666;
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.auth-form {
+    margin-bottom: 1.5rem;
+}
+
+.otp-inputs {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.otp-input {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    font-size: 1.2rem;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    background: #fff;
+    transition: all 0.3s;
+}
+
+.otp-input:focus {
+    border-color: #4CAF50;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+.btn {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn i {
+    margin-right: 8px;
+}
+
+.btn-primary {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #45a049;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.auth-footer p {
+    margin: 0.5rem 0;
+    color: #666;
+}
+
+.auth-footer a {
+    color: #4CAF50;
+    text-decoration: none;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+
+.alert {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 5px;
+}
+
+.alert-success {
+    background-color: #dff0d8;
+    color: #3c763d;
+    border: 1px solid #d6e9c6;
+}
+
+.alert-error {
+    background-color: #f2dede;
+    color: #a94442;
+    border: 1px solid #ebccd1;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const inputs = document.querySelectorAll('.otp-input');
+    const fullTokenInput = document.getElementById('fullToken');
+    
+    // Auto-focus next input
+    inputs.forEach((input, index) => {
+        input.addEventListener('input', function() {
+            if (this.value.length === 1) {
+                if (index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+            }
+            updateFullToken();
+        });
+        
+        // Handle backspace
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Backspace' && !this.value && index > 0) {
+                inputs[index - 1].focus();
+            }
+        });
+
+        // Handle paste event
+        input.addEventListener('paste', function(e) {
+            e.preventDefault();
+            const pastedData = e.clipboardData.getData('text').slice(0, 8);
+            if (/^\d+$/.test(pastedData)) {
+                for (let i = 0; i < pastedData.length && i < inputs.length; i++) {
+                    inputs[i].value = pastedData[i];
+                }
+                if (pastedData.length === 8) {
+                    inputs[7].focus();
+                } else if (pastedData.length < 8) {
+                    inputs[pastedData.length].focus();
+                }
+                updateFullToken();
+            }
+        });
+    });
+    
+    // Update the hidden input with the full token
+    function updateFullToken() {
+        const token = Array.from(inputs).map(input => input.value).join('');
+        fullTokenInput.value = token;
+    }
+
+    // Form submission
+    document.getElementById('otpForm').addEventListener('submit', function(e) {
+        const token = fullTokenInput.value;
+        if (token.length !== 8) {
+            e.preventDefault();
+            alert('Please enter the complete 8-digit code');
+        }
+    });
+});
+</script>
+{% endblock %} 

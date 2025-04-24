@@ -13,7 +13,7 @@
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h3><i class="fas fa-dumbbell"></i> Emmatos Fitness</h3>
+                <h3><i class="fas fa-dumbbell"></i> FitWithMe</h3>
             </div>
             
             <nav class="sidebar-nav">
@@ -25,6 +25,7 @@
                     <li><a href="#nutrition"><i class="fas fa-apple-alt"></i> <span>Nutrition</span></a></li>
                     <li><a href="#messages"><i class="fas fa-envelope"></i> <span>Messages</span></a></li>
                     <li><a href="#settings"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+                    <li><a href="#users"><i class="fas fa-users"></i> <span>Community</span></a></li>
                 </ul>
             </nav>
             
@@ -56,41 +57,41 @@
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-icon bg-primary">
-                            <i class="fas fa-users"></i>
+                            <i class="fas fa-dumbbell"></i>
                         </div>
                         <div class="stat-info">
-                            <h3>Total Members</h3>
-                            <p>{{ stats.total_users }}</p>
+                            <h3>Workouts</h3>
+                            <p>{{ stats.workouts|default(0) }}</p>
                         </div>
                     </div>
                     
                     <div class="stat-card">
                         <div class="stat-icon bg-success">
-                            <i class="fas fa-check-circle"></i>
+                            <i class="fas fa-fire"></i>
                         </div>
                         <div class="stat-info">
-                            <h3>Active Members</h3>
-                            <p>{{ stats.verified_users }}</p>
+                            <h3>Calories Burned</h3>
+                            <p>{{ stats.calories|default(0) }}</p>
                         </div>
                     </div>
                     
                     <div class="stat-card">
                         <div class="stat-icon bg-warning">
-                            <i class="fas fa-clock"></i>
+                            <i class="fas fa-stopwatch"></i>
                         </div>
                         <div class="stat-info">
-                            <h3>Pending Members</h3>
-                            <p>{{ stats.unverified_users }}</p>
+                            <h3>Active Minutes</h3>
+                            <p>{{ stats.active_minutes|default(0) }}</p>
                         </div>
                     </div>
                     
                     <div class="stat-card">
-                        <div class="stat-icon bg-danger">
-                            <i class="fas fa-exclamation-triangle"></i>
+                        <div class="stat-icon bg-info">
+                            <i class="fas fa-medal"></i>
                         </div>
                         <div class="stat-info">
-                            <h3>Issues</h3>
-                            <p>0</p>
+                            <h3>Achievements</h3>
+                            <p>{{ stats.achievements|default(0) }}</p>
                         </div>
                     </div>
                 </div>
@@ -171,7 +172,6 @@
     </div>
 
     <script>
-        // Add some interactive elements
         document.addEventListener('DOMContentLoaded', function() {
             // Add hover effect to stat cards
             const statCards = document.querySelectorAll('.stat-card');

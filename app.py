@@ -1,15 +1,19 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
-from datetime import datetime
+import re
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session, flash
+from datetime import datetime, timedelta
 import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
 import secrets
 import os
 import traceback
-import re
 from models import db, User, VerificationToken
 from flask_migrate import Migrate
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from dotenv import load_dotenv
+import json
+import requests
+import random
+
 
 # Load environment variables from .env file
 load_dotenv()
@@ -30,8 +34,11 @@ login_manager.login_view = 'login'
 
 # Brevo API configuration
 BREVO_API_KEY = os.getenv('BREVO_API_KEY')
-if not BREVO_API_KEY:
-    raise ValueError("BREVO_API_KEY environment variable is not set")
+BREVO_API_URL = 'https://api.brevo.com/v3/'
+HEADERS = {
+    'api-key': BREVO_API_KEY,
+    'Content-Type': 'application/json'
+}
 
 configuration = sib_api_v3_sdk.Configuration()
 configuration.api_key['api-key'] = BREVO_API_KEY
@@ -47,36 +54,37 @@ def load_user(user_id):
 
 def send_verification_email(email, token):
     try:
-        sender = {"name": "Danilo", "email": "okikidanielayo@gmail.com"}
-        to = [{"email": email}]
-        subject = "Verify your email address"
-        html_content = f"""
-        <html>
-            <body>
-                <h2>Welcome to Fit With COACH Daniel!</h2>
-                <p>Please verify your email address by clicking the link below:</p>
-                <p><a href="{request.host_url}verify/{token}">Verify Email</a></p>
-                <p>This link will expire in 24 hours.</p>
-                <p>If you did not create an account, please ignore this email.</p>
-            </body>
-        </html>
-        """
-        
-        send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
-            to=to,
-            html_content=html_content,
-            sender=sender,
-            subject=subject
-        )
-        
-        api_instance.send_transac_email(send_smtp_email)
-        return True
-    except ApiException as e:
+        email_data = {
+            "sender": {"email": "okikidanielayo@gmail.com", "name": "Fit With COACH Daniel"},
+            "to": [{"email": email}],
+            "subject": "Verify Your Email - Fit With COACH Daniel",
+            "htmlContent": f'''
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #4CAF50;">Welcome to Fit With COACH Daniel!</h2>
+                    <p>Thank you for registering. Please use the following code to verify your email address:</p>
+                    <div style="background-color: #f5f5f5; padding: 20px; text-align: center; font-size: 24px; letter-spacing: 5px; margin: 20px 0;">
+                        <strong>{token}</strong>
+                    </div>
+                    <p>This code will expire in 24 hours.</p>
+                    <p>If you did not create an account, please ignore this email.</p>
+                    <hr style="border: 1px solid #eee; margin: 20px 0;">
+                    <p style="color: #666; font-size: 12px;">This is an automated message, please do not reply.</p>
+                </div>
+            '''
+        }
+        response = requests.post(f'{BREVO_API_URL}smtp/email', headers=HEADERS, data=json.dumps(email_data))
+        print(response.text)
+
+        if response.status_code == 201:
+            return True
+        else:
+            print(f"Failed to send email: {response.text}")
+            return False
+    except Exception as e:
         print(f"Error sending email: {e}")
         return False
-    except Exception as e:
-        print(f"Unexpected error sending email: {e}")
-        return False
+        
+
 
 # Helper functions for dashboard
 def format_date(date_str):
@@ -88,7 +96,7 @@ def format_date(date_str):
         return date_str
 
 def get_user_stats():
-    """Get statistics about users."""
+    """Get user statistics."""
     total_users = User.query.count()
     verified_users = User.query.filter_by(verified=True).count()
     unverified_users = total_users - verified_users
@@ -97,6 +105,16 @@ def get_user_stats():
         'total_users': total_users,
         'verified_users': verified_users,
         'unverified_users': unverified_users
+    }
+
+def get_customer_stats(user_id):
+    """Get customer-specific statistics."""
+    # TODO: Replace with actual data from workout tracking
+    return {
+        'workouts': 0,
+        'calories': 0,
+        'active_minutes': 0,
+        'achievements': 0
     }
 
 def get_recent_activity(user_email):
@@ -169,11 +187,15 @@ def validate_registration_form():
 
 def validate_login_form():
     """Validate the login form data."""
-    email = request.form.get('email', '')
-    password = request.form.get('password', '')
+    email = request.form.get('email')
+    password = request.form.get('password')
     
-    if not email or not password:
-        flash('Email and password are required.')
+    if not email:
+        flash('Email is required.')
+        return False
+        
+    if not password:
+        flash('Password is required.')
         return False
         
     # Email validation
@@ -196,26 +218,35 @@ def login():
     
     if request.method == 'POST':
         try:
-            if not validate_login_form():
+            email = request.form.get('email')
+            password = request.form.get('password')
+            
+            if not email or not password:
+                flash('All fields are required.')
                 return redirect(url_for('login'))
-                
-            email = request.form['email']
-            password = request.form['password']
             
             user = User.query.filter_by(email=email).first()
             
-            if user and user.check_password(password):
-                if not user.verified:
-                    flash('Please verify your email address first.')
-                    return redirect(url_for('login'))
-                login_user(user)
-                return redirect(url_for('dashboard'))
-            else:
+            if not user:
                 flash('Invalid email or password')
+                return redirect(url_for('login'))
+                
+            if not user.check_password(password):
+                flash('Invalid email or password')
+                return redirect(url_for('login'))
+                
+            if not user.verified:
+                flash('Please verify your email address first.')
+                return redirect(url_for('login'))
+                
+            login_user(user)
+            return redirect(url_for('dashboard'))
+                
         except Exception as e:
             print(f"Login error: {e}")
             traceback.print_exc()
             flash('An error occurred during login. Please try again.')
+            return redirect(url_for('login'))
     
     return render_template('login.html')
 
@@ -225,73 +256,138 @@ def register():
         return redirect(url_for('dashboard'))
     
     if request.method == 'POST':
+        name = request.form.get('name')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+
+        if not name or not email or not password or not confirm_password:
+            flash('All fields are required', 'error')
+            return redirect(url_for('register'))
+
+        if password != confirm_password:
+            flash('Passwords do not match', 'error')
+            return redirect(url_for('register'))
+
+        if User.query.filter_by(email=email).first():
+            flash('Email already registered', 'error')
+            return redirect(url_for('register'))
+
+        # Generate a random 8-digit token
+        token = ''.join([str(random.randint(0, 9)) for _ in range(8)])
+        
+        # Create new user
+        new_user = User(name=name, email=email)
+        new_user.set_password(password)
+        db.session.add(new_user)
+        
+        # Create verification token
+        verification_token = VerificationToken(token=token, email=email)
+        db.session.add(verification_token)
+        
         try:
-            if not validate_registration_form():
-                return redirect(url_for('register'))
-                
-            name = request.form['name']
-            email = request.form['email']
-            password = request.form['password']
+            db.session.commit()
             
-            if User.query.filter_by(email=email).first():
-                flash('Email already registered')
+            # Send verification email
+            if send_verification_email(email, token):
+                flash('Registration successful! Please check your email for verification code.', 'success')
+                return render_template('verify_token.html', token=token)
             else:
-                user = User(name=name, email=email)
-                user.set_password(password)
+                flash('Registration successful but failed to send verification email. Please try again.', 'error')
+                return redirect(url_for('resend_verification'))
                 
-                # Generate verification token
-                token = secrets.token_urlsafe(32)
-                verification_token = VerificationToken(token=token, email=email)
-                
-                db.session.add(user)
-                db.session.add(verification_token)
-                db.session.commit()
-                
-                # Send verification email
-                if send_verification_email(email, token):
-                    flash('Registration successful! Please check your email to verify your account.')
-                else:
-                    flash('Registration successful but failed to send verification email. Please contact support.')
-                
-                return redirect(url_for('login'))
         except Exception as e:
+            db.session.rollback()
             print(f"Registration error: {e}")
             traceback.print_exc()
-            flash('An error occurred during registration. Please try again.')
-    
+            flash('An error occurred during registration. Please try again.', 'error')
+            return redirect(url_for('register'))
+
     return render_template('register.html')
 
-@app.route('/verify/<token>')
-def verify_email(token):
-    try:
-        verification = VerificationToken.query.filter_by(token=token).first()
+@app.route('/verify/<token>', methods=['GET', 'POST'])
+def verify_token(token):
+    verification = VerificationToken.query.filter_by(token=token).first()
+    
+    if not verification:
+        flash('Invalid verification code', 'error')
+        return redirect(url_for('login'))
+    
+    if verification.is_expired:
+        flash('Verification code has expired', 'error')
+        return redirect(url_for('resend_verification'))
+    
+    if request.method == 'POST':
+        submitted_token = request.form.get('token')
         
-        if not verification:
-            flash('Invalid verification link.')
-            return redirect(url_for('login'))
-            
-        if verification.is_expired:
-            db.session.delete(verification)
-            db.session.commit()
-            flash('Verification link has expired. Please request a new one.')
-            return redirect(url_for('login'))
-            
-        user = User.query.filter_by(email=verification.email).first()
+        if submitted_token == token:
+            user = User.query.filter_by(email=verification.email).first()
+            if user:
+                user.verified = True  # Changed from is_verified to verified
+                db.session.delete(verification)
+                try:
+                    db.session.commit()
+                    flash('Email verified successfully! You can now login.', 'success')
+                    return redirect(url_for('login'))
+                except Exception as e:
+                    db.session.rollback()
+                    print(f"Verification error: {e}")
+                    traceback.print_exc()
+                    flash('An error occurred during verification. Please try again.', 'error')
+                    return redirect(url_for('verify_token', token=token))
+            else:
+                flash('User not found', 'error')
+                return redirect(url_for('register'))
+        else:
+            flash('Invalid verification code', 'error')
+            return redirect(url_for('verify_token', token=token))
+    
+    return render_template('verify_token.html', token=token)
+
+@app.route('/resend-verification', methods=['GET', 'POST'])
+def resend_verification():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        user = User.query.filter_by(email=email).first()
+        
         if not user:
-            flash('User not found.')
-            return redirect(url_for('login'))
-            
-        user.verified = True
-        db.session.delete(verification)
-        db.session.commit()
+            flash('Email not found', 'error')
+            return redirect(url_for('resend_verification'))
         
-        flash('Email verified successfully! You can now login.')
-        return redirect(url_for('login'))
-    except Exception as e:
-        print(f"Verification error: {e}")
-        traceback.print_exc()
-        flash('An error occurred during verification. Please try again.')
-        return redirect(url_for('login'))
+        if user.is_verified:
+            flash('Email is already verified', 'error')
+            return redirect(url_for('login'))
+        
+        # Generate new token
+        token = ''.join([str(random.randint(0, 9)) for _ in range(8)])
+        
+        # Delete old verification tokens
+        VerificationToken.query.filter_by(email=email).delete()
+        
+        # Create new verification token
+        verification_token = VerificationToken(
+            token=token,
+            email=email,
+            expires_at=datetime.utcnow() + timedelta(hours=24)
+        )
+        db.session.add(verification_token)
+        
+        try:
+            db.session.commit()
+            
+            if send_verification_email(email, token):
+                flash('Verification code has been resent to your email', 'success')
+                return redirect(url_for('verify_token', token=token))
+            else:
+                flash('Failed to send verification email', 'error')
+                return redirect(url_for('resend_verification'))
+                
+        except Exception as e:
+            db.session.rollback()
+            flash('An error occurred. Please try again.', 'error')
+            return redirect(url_for('resend_verification'))
+    
+    return render_template('resend_verification.html')
 
 @app.route('/dashboard')
 @login_required
@@ -301,8 +397,11 @@ def dashboard():
         user_dict = user.to_dict()
         user_dict['formatted_created_at'] = format_date(user_dict['created_at'])
         
-        # Get user statistics
-        stats = get_user_stats()
+        # Get stats based on user role
+        if user.is_admin:
+            stats = get_user_stats()
+        else:
+            stats = get_customer_stats(user.id)
         
         # Get recent activity
         activities = get_recent_activity(user.email)

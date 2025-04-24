@@ -1,0 +1,344 @@
+{% extends "dashboard.html" %}
+
+{% block content %}
+<div class="nutrition-container">
+    <div class="nutrition-header">
+        <h2><i class="fas fa-apple-alt"></i> Nutrition Tracking</h2>
+        <p>Monitor your diet and maintain a healthy eating plan</p>
+    </div>
+
+    <div class="nutrition-content">
+        <!-- Daily Nutrition Overview -->
+        <div class="nutrition-section">
+            <div class="section-header">
+                <h3><i class="fas fa-chart-pie"></i> Daily Nutrition</h3>
+                <div class="date-selector">
+                    <input type="date" class="form-control" value="{{ current_date }}">
+                </div>
+            </div>
+            
+            <div class="nutrition-overview">
+                <div class="nutrition-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>Calories</h4>
+                            <p>{{ nutrition.calories_consumed }}/{{ nutrition.calories_goal }} kcal</p>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: {{ (nutrition.calories_consumed/nutrition.calories_goal)*100 }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-drumstick-bite"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>Protein</h4>
+                            <p>{{ nutrition.protein_consumed }}/{{ nutrition.protein_goal }}g</p>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: {{ (nutrition.protein_consumed/nutrition.protein_goal)*100 }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-bread-slice"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>Carbs</h4>
+                            <p>{{ nutrition.carbs_consumed }}/{{ nutrition.carbs_goal }}g</p>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: {{ (nutrition.carbs_consumed/nutrition.carbs_goal)*100 }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-oil-can"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>Fat</h4>
+                            <p>{{ nutrition.fat_consumed }}/{{ nutrition.fat_goal }}g</p>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: {{ (nutrition.fat_consumed/nutrition.fat_goal)*100 }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Meal Tracking -->
+        <div class="nutrition-section">
+            <div class="section-header">
+                <h3><i class="fas fa-utensils"></i> Meal Tracking</h3>
+                <button class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Meal
+                </button>
+            </div>
+            
+            <div class="meals-list">
+                {% for meal in meals %}
+                <div class="meal-item">
+                    <div class="meal-header">
+                        <h4>{{ meal.name }}</h4>
+                        <span class="meal-time">{{ meal.time }}</span>
+                    </div>
+                    <div class="meal-content">
+                        <div class="meal-foods">
+                            {% for food in meal.foods %}
+                            <div class="food-item">
+                                <span class="food-name">{{ food.name }}</span>
+                                <span class="food-calories">{{ food.calories }} kcal</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="meal-totals">
+                            <div class="total-item">
+                                <span class="total-label">Total Calories</span>
+                                <span class="total-value">{{ meal.total_calories }} kcal</span>
+                            </div>
+                            <div class="total-item">
+                                <span class="total-label">Protein</span>
+                                <span class="total-value">{{ meal.total_protein }}g</span>
+                            </div>
+                            <div class="total-item">
+                                <span class="total-label">Carbs</span>
+                                <span class="total-value">{{ meal.total_carbs }}g</span>
+                            </div>
+                            <div class="total-item">
+                                <span class="total-label">Fat</span>
+                                <span class="total-value">{{ meal.total_fat }}g</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Water Intake -->
+        <div class="nutrition-section">
+            <div class="section-header">
+                <h3><i class="fas fa-tint"></i> Water Intake</h3>
+            </div>
+            
+            <div class="water-tracker">
+                <div class="water-goal">
+                    <span class="water-consumed">{{ water_intake.consumed }}L</span>
+                    <span class="water-target">/ {{ water_intake.goal }}L</span>
+                </div>
+                <div class="water-bottles">
+                    {% for i in range(water_intake.goal) %}
+                    <div class="water-bottle {{ 'filled' if i < water_intake.consumed else '' }}">
+                        <i class="fas fa-wine-bottle"></i>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Water
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.nutrition-container {
+    padding: 2rem;
+}
+
+.nutrition-header {
+    margin-bottom: 2rem;
+}
+
+.nutrition-section {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.date-selector {
+    width: 200px;
+}
+
+.nutrition-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.stat-card {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    background: #4CAF50;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.stat-info {
+    flex: 1;
+}
+
+.stat-info h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.stat-info p {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #343a40;
+}
+
+.progress-bar {
+    height: 6px;
+    background: #e9ecef;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    background: #4CAF50;
+    border-radius: 3px;
+}
+
+.meals-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.meal-item {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+}
+
+.meal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.meal-time {
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+.meal-foods {
+    margin-bottom: 1rem;
+}
+
+.food-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.food-name {
+    color: #343a40;
+}
+
+.food-calories {
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+.meal-totals {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.total-item {
+    text-align: center;
+}
+
+.total-label {
+    display: block;
+    color: #6c757d;
+    font-size: 0.75rem;
+}
+
+.total-value {
+    display: block;
+    color: #343a40;
+    font-weight: 600;
+}
+
+.water-tracker {
+    text-align: center;
+}
+
+.water-goal {
+    margin-bottom: 1.5rem;
+}
+
+.water-consumed {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #343a40;
+}
+
+.water-target {
+    font-size: 1.5rem;
+    color: #6c757d;
+}
+
+.water-bottles {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.water-bottle {
+    width: 40px;
+    height: 40px;
+    background: #e9ecef;
+    color: #6c757d;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.water-bottle.filled {
+    background: #4CAF50;
+    color: white;
+}
+</style>
+{% endblock %} 

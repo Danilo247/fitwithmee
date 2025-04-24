@@ -1,0 +1,374 @@
+{% extends "dashboard.html" %}
+
+{% block content %}
+<div class="progress-container">
+    <div class="progress-header">
+        <h2><i class="fas fa-chart-line"></i> Progress Tracking</h2>
+        <p>Monitor your fitness journey and celebrate your achievements</p>
+    </div>
+
+    <div class="progress-content">
+        <!-- Progress Overview -->
+        <div class="progress-section">
+            <div class="section-header">
+                <h3><i class="fas fa-chart-pie"></i> Progress Overview</h3>
+                <button class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Set New Goal
+                </button>
+            </div>
+            
+            <div class="progress-overview">
+                <div class="progress-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-weight"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>Weight</h4>
+                            <p>{{ progress.current_weight }} kg</p>
+                            <span class="trend {{ progress.weight_trend }}">
+                                <i class="fas fa-arrow-{{ 'up' if progress.weight_trend == 'up' else 'down' }}"></i>
+                                {{ progress.weight_change }} kg
+                            </span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-ruler"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>Body Fat</h4>
+                            <p>{{ progress.body_fat }}%</p>
+                            <span class="trend {{ progress.body_fat_trend }}">
+                                <i class="fas fa-arrow-{{ 'up' if progress.body_fat_trend == 'up' else 'down' }}"></i>
+                                {{ progress.body_fat_change }}%
+                            </span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-male"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>Muscle Mass</h4>
+                            <p>{{ progress.muscle_mass }} kg</p>
+                            <span class="trend {{ progress.muscle_trend }}">
+                                <i class="fas fa-arrow-{{ 'up' if progress.muscle_trend == 'up' else 'down' }}"></i>
+                                {{ progress.muscle_change }} kg
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="progress-chart">
+                    <canvas id="progressChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Goals -->
+        <div class="progress-section">
+            <div class="section-header">
+                <h3><i class="fas fa-bullseye"></i> Goals</h3>
+            </div>
+            
+            <div class="goals-list">
+                {% for goal in goals %}
+                <div class="goal-item">
+                    <div class="goal-info">
+                        <h4>{{ goal.title }}</h4>
+                        <p>{{ goal.description }}</p>
+                        <div class="goal-progress">
+                            <div class="progress-bar">
+                                <div class="progress" style="width: {{ goal.progress }}%"></div>
+                            </div>
+                            <span class="progress-text">{{ goal.progress }}%</span>
+                        </div>
+                    </div>
+                    <div class="goal-details">
+                        <span class="goal-date">Target: {{ goal.target_date }}</span>
+                        <span class="goal-status {{ goal.status }}">{{ goal.status }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Achievements -->
+        <div class="progress-section">
+            <div class="section-header">
+                <h3><i class="fas fa-trophy"></i> Achievements</h3>
+            </div>
+            
+            <div class="achievements-grid">
+                {% for achievement in achievements %}
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <i class="fas fa-{{ achievement.icon }}"></i>
+                    </div>
+                    <div class="achievement-info">
+                        <h4>{{ achievement.title }}</h4>
+                        <p>{{ achievement.description }}</p>
+                        <span class="achievement-date">{{ achievement.date }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.progress-container {
+    padding: 2rem;
+}
+
+.progress-header {
+    margin-bottom: 2rem;
+}
+
+.progress-section {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.progress-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    background: #4CAF50;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.stat-info {
+    flex: 1;
+}
+
+.stat-info h4 {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.stat-info p {
+    margin: 0.25rem 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #343a40;
+}
+
+.trend {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+
+.trend.up {
+    background: #d4edda;
+    color: #155724;
+}
+
+.trend.down {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.progress-chart {
+    height: 300px;
+    margin-top: 2rem;
+}
+
+.goals-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.goal-item {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.goal-info {
+    flex: 1;
+}
+
+.goal-info h4 {
+    margin: 0 0 0.5rem 0;
+    color: #343a40;
+}
+
+.goal-info p {
+    margin: 0 0 1rem 0;
+    color: #6c757d;
+}
+
+.goal-progress {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    background: #4CAF50;
+    border-radius: 4px;
+}
+
+.progress-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.goal-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.goal-date {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.goal-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.goal-status.active {
+    background: #d4edda;
+    color: #155724;
+}
+
+.goal-status.completed {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.achievement-card {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.achievement-icon {
+    width: 50px;
+    height: 50px;
+    background: #4CAF50;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.achievement-info {
+    flex: 1;
+}
+
+.achievement-info h4 {
+    margin: 0 0 0.5rem 0;
+    color: #343a40;
+}
+
+.achievement-info p {
+    margin: 0 0 0.5rem 0;
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+.achievement-date {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('progressChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ progress.dates|tojson }},
+            datasets: [{
+                label: 'Weight',
+                data: {{ progress.weight_data|tojson }},
+                borderColor: '#4CAF50',
+                tension: 0.1
+            }, {
+                label: 'Body Fat',
+                data: {{ progress.body_fat_data|tojson }},
+                borderColor: '#2196F3',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: false
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %} 

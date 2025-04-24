@@ -1,0 +1,339 @@
+{% extends "dashboard.html" %}
+
+{% block content %}
+<div class="workouts-container">
+    <div class="workouts-header">
+        <h2><i class="fas fa-running"></i> Workout Plans</h2>
+        <p>Track your workouts and follow your personalized training plan</p>
+    </div>
+
+    <div class="workouts-content">
+        <!-- Current Workout Plan -->
+        <div class="workout-section">
+            <div class="section-header">
+                <h3><i class="fas fa-calendar-check"></i> Current Plan</h3>
+                <button class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Workout
+                </button>
+            </div>
+            
+            <div class="workout-plan">
+                <div class="plan-overview">
+                    <div class="plan-stats">
+                        <div class="stat">
+                            <span class="stat-value">{{ current_plan.workouts_per_week|default(0) }}</span>
+                            <span class="stat-label">Workouts/Week</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value">{{ current_plan.duration|default('0') }} weeks</span>
+                            <span class="stat-label">Duration</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value">{{ current_plan.progress|default(0) }}%</span>
+                            <span class="stat-label">Progress</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workout-schedule">
+                    <h4>Weekly Schedule</h4>
+                    <div class="schedule-grid">
+                        {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+                        <div class="schedule-day">
+                            <h5>{{ day }}</h5>
+                            {% if workouts[day] %}
+                                <div class="workout-item">
+                                    <span class="workout-type">{{ workouts[day].type }}</span>
+                                    <span class="workout-time">{{ workouts[day].time }}</span>
+                                    <span class="workout-status {{ workouts[day].status }}">{{ workouts[day].status }}</span>
+                                </div>
+                            {% else %}
+                                <div class="rest-day">
+                                    <i class="fas fa-moon"></i>
+                                    <span>Rest Day</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workout History -->
+        <div class="workout-section">
+            <div class="section-header">
+                <h3><i class="fas fa-history"></i> Workout History</h3>
+            </div>
+            
+            <div class="workout-history">
+                <div class="history-filters">
+                    <select class="form-control">
+                        <option>All Time</option>
+                        <option>Last 7 Days</option>
+                        <option>Last 30 Days</option>
+                        <option>Last 3 Months</option>
+                    </select>
+                </div>
+
+                <div class="history-list">
+                    {% for workout in workout_history %}
+                    <div class="history-item">
+                        <div class="workout-info">
+                            <span class="workout-date">{{ workout.date }}</span>
+                            <span class="workout-type">{{ workout.type }}</span>
+                            <span class="workout-duration">{{ workout.duration }} min</span>
+                        </div>
+                        <div class="workout-details">
+                            <div class="detail">
+                                <i class="fas fa-fire"></i>
+                                <span>{{ workout.calories }} kcal</span>
+                            </div>
+                            <div class="detail">
+                                <i class="fas fa-heartbeat"></i>
+                                <span>{{ workout.avg_heart_rate }} bpm</span>
+                            </div>
+                            <div class="detail">
+                                <i class="fas fa-trophy"></i>
+                                <span>{{ workout.achievements|length }} achievements</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Workout Statistics -->
+        <div class="workout-section">
+            <div class="section-header">
+                <h3><i class="fas fa-chart-bar"></i> Statistics</h3>
+            </div>
+            
+            <div class="workout-stats">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>Total Time</h4>
+                            <p>{{ stats.total_time }} hours</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>Calories Burned</h4>
+                            <p>{{ stats.total_calories }} kcal</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-dumbbell"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>Workouts Completed</h4>
+                            <p>{{ stats.total_workouts }}</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h4>Achievements</h4>
+                            <p>{{ stats.total_achievements }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.workouts-container {
+    padding: 2rem;
+}
+
+.workouts-header {
+    margin-bottom: 2rem;
+}
+
+.workout-section {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.plan-overview {
+    margin-bottom: 2rem;
+}
+
+.plan-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.stat {
+    text-align: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #4CAF50;
+}
+
+.stat-label {
+    display: block;
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+.schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.schedule-day {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.schedule-day h5 {
+    margin-bottom: 1rem;
+    color: #343a40;
+}
+
+.workout-item {
+    background: white;
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+}
+
+.workout-type {
+    display: block;
+    font-weight: 500;
+    color: #4CAF50;
+}
+
+.workout-time {
+    display: block;
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.workout-status {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.workout-status.completed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.workout-status.pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.rest-day {
+    text-align: center;
+    padding: 1rem;
+    color: #6c757d;
+}
+
+.history-filters {
+    margin-bottom: 1.5rem;
+}
+
+.history-item {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.workout-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.workout-details {
+    display: flex;
+    gap: 1rem;
+}
+
+.detail {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6c757d;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.stat-card {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    background: #4CAF50;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-info h4 {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.stat-info p {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #343a40;
+}
+</style>
+{% endblock %} 

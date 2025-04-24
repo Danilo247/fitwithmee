@@ -1,0 +1,172 @@
+{% extends "dashboard.html" %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-header">
+        <h2><i class="fas fa-user-circle"></i> Profile Settings</h2>
+        <p>Manage your personal information and account settings</p>
+    </div>
+
+    <div class="profile-content">
+        <div class="profile-section">
+            <div class="profile-picture">
+                <img src="{{ url_for('static', filename='images/default-avatar.jpg') }}" alt="Profile Picture">
+                <button class="btn btn-primary btn-sm">
+                    <i class="fas fa-camera"></i> Change Picture
+                </button>
+            </div>
+
+            <div class="profile-info">
+                <form class="profile-form">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" value="{{ user.name }}" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" value="{{ user.email }}" class="form-control" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" value="{{ user.phone|default('') }}" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Date of Birth</label>
+                        <input type="date" value="{{ user.dob|default('') }}" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <select class="form-control">
+                            <option value="male" {% if user.gender == 'male' %}selected{% endif %}>Male</option>
+                            <option value="female" {% if user.gender == 'female' %}selected{% endif %}>Female</option>
+                            <option value="other" {% if user.gender == 'other' %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <h3><i class="fas fa-lock"></i> Security Settings</h3>
+            <form class="security-form">
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <input type="password" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Confirm New Password</label>
+                    <input type="password" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-key"></i> Update Password
+                </button>
+            </form>
+        </div>
+
+        <div class="profile-section">
+            <h3><i class="fas fa-bell"></i> Notification Preferences</h3>
+            <div class="notification-settings">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="emailNotifications" checked>
+                    <label class="form-check-label" for="emailNotifications">Email Notifications</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="workoutReminders" checked>
+                    <label class="form-check-label" for="workoutReminders">Workout Reminders</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="progressUpdates" checked>
+                    <label class="form-check-label" for="progressUpdates">Progress Updates</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="communityUpdates" checked>
+                    <label class="form-check-label" for="communityUpdates">Community Updates</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.profile-container {
+    padding: 2rem;
+}
+
+.profile-header {
+    margin-bottom: 2rem;
+}
+
+.profile-section {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.profile-picture {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.profile-picture img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+    object-fit: cover;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.form-check {
+    margin-bottom: 1rem;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #45a049;
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+</style>
+{% endblock %} 

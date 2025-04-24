@@ -5,6 +5,10 @@ from flask_login import UserMixin
 
 db = SQLAlchemy()
 
+# Role constants
+ROLE_ADMIN = 'admin'
+ROLE_CUSTOMER = 'customer'
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -12,6 +16,7 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(256), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     verified = db.Column(db.Boolean, default=False)
+    role = db.Column(db.String(20), nullable=False, default=ROLE_CUSTOMER)
     
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -25,8 +30,17 @@ class User(db.Model, UserMixin):
             'name': self.name,
             'email': self.email,
             'created_at': self.created_at.strftime("%Y-%m-%d %H:%M:%S"),
-            'verified': self.verified
+            'verified': self.verified,
+            'role': self.role
         }
+    
+    @property
+    def is_admin(self):
+        return self.role == ROLE_ADMIN
+    
+    @property
+    def is_customer(self):
+        return self.role == ROLE_CUSTOMER
 
 class VerificationToken(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -31,17 +31,17 @@
                 <div class="form-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" required 
-                           pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-                           placeholder="Enter your email">
+                           placeholder="Enter your email"
+                           value="{{ request.form.email }}">
                     <i class="fas fa-envelope"></i>
                 </div>
                 
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required minlength="8"
+                    <input type="password" id="password" name="password" required
                            placeholder="Enter your password">
                     <i class="fas fa-lock"></i>
-                    <a href="#" class="forgot-password">Forgot password?</a>
+                    <a href="{{ url_for('resend_verification') }}" class="forgot-password">Forgot password?</a>
                 </div>
                 
                 <button type="submit" class="btn-primary">
@@ -57,49 +57,18 @@
     </div>
     
     <script>
-        // Add some interactive elements
         document.addEventListener('DOMContentLoaded', function() {
-            // Create floating fitness icons
-            const icons = ['dumbbell', 'heart', 'running', 'bicycle', 'swimming-pool'];
-            const container = document.querySelector('body');
-            
-            for (let i = 0; i < 8; i++) {
-                const icon = document.createElement('div');
-                icon.className = 'floating-icon';
-                icon.innerHTML = `<i class="fas fa-${icons[Math.floor(Math.random() * icons.length)]}"></i>`;
-                
-                // Random position
-                icon.style.left = `${Math.random() * 100}%`;
-                icon.style.top = `${Math.random() * 100}%`;
-                
-                // Random size
-                const size = Math.random() * 20 + 10;
-                icon.style.fontSize = `${size}px`;
-                
-                // Random animation duration
-                const duration = Math.random() * 10 + 10;
-                icon.style.animationDuration = `${duration}s`;
-                
-                // Random delay
-                const delay = Math.random() * 5;
-                icon.style.animationDelay = `${delay}s`;
-                
-                container.appendChild(icon);
-            }
-            
-            // Add password visibility toggle
+            const form = document.querySelector('.auth-form');
+            const emailInput = document.getElementById('email');
             const passwordInput = document.getElementById('password');
-            const passwordIcon = document.querySelector('.fa-lock');
             
-            passwordIcon.addEventListener('click', function() {
-                if (passwordInput.type === 'password') {
-                    passwordInput.type = 'text';
-                    passwordIcon.classList.remove('fa-lock');
-                    passwordIcon.classList.add('fa-lock-open');
-                } else {
-                    passwordInput.type = 'password';
-                    passwordIcon.classList.remove('fa-lock-open');
-                    passwordIcon.classList.add('fa-lock');
+            form.addEventListener('submit', function(e) {
+                if (!emailInput.value || !passwordInput.value) {
+                    e.preventDefault();
+                    const alert = document.createElement('div');
+                    alert.className = 'alert';
+                    alert.innerHTML = '<i class="fas fa-info-circle"></i> All fields are required.';
+                    form.insertBefore(alert, form.firstChild);
                 }
             });
         });

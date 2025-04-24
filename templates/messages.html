@@ -1,0 +1,344 @@
+{% extends "dashboard.html" %}
+
+{% block content %}
+<div class="messages-container">
+    <div class="messages-header">
+        <h2><i class="fas fa-envelope"></i> Messages</h2>
+        <p>Communicate with your coach and stay updated</p>
+    </div>
+
+    <div class="messages-content">
+        <!-- Conversations List -->
+        <div class="conversations-section">
+            <div class="section-header">
+                <h3><i class="fas fa-comments"></i> Conversations</h3>
+                <button class="btn btn-primary">
+                    <i class="fas fa-plus"></i> New Message
+                </button>
+            </div>
+            
+            <div class="conversations-list">
+                {% for conversation in conversations %}
+                <div class="conversation-item {{ 'active' if conversation.id == current_conversation.id }}">
+                    <div class="conversation-avatar">
+                        <img src="{{ conversation.avatar }}" alt="{{ conversation.name }}">
+                        {% if conversation.online %}
+                        <span class="online-status"></span>
+                        {% endif %}
+                    </div>
+                    <div class="conversation-info">
+                        <h4>{{ conversation.name }}</h4>
+                        <p class="last-message">{{ conversation.last_message }}</p>
+                        <span class="message-time">{{ conversation.last_time }}</span>
+                    </div>
+                    {% if conversation.unread %}
+                    <span class="unread-badge">{{ conversation.unread }}</span>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-section">
+            {% if current_conversation %}
+            <div class="chat-header">
+                <div class="chat-user">
+                    <img src="{{ current_conversation.avatar }}" alt="{{ current_conversation.name }}">
+                    <div class="user-info">
+                        <h4>{{ current_conversation.name }}</h4>
+                        <span class="user-status">{{ 'Online' if current_conversation.online else 'Offline' }}</span>
+                    </div>
+                </div>
+                <div class="chat-actions">
+                    <button class="btn btn-icon">
+                        <i class="fas fa-phone"></i>
+                    </button>
+                    <button class="btn btn-icon">
+                        <i class="fas fa-video"></i>
+                    </button>
+                    <button class="btn btn-icon">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="chat-messages">
+                {% for message in current_conversation.messages %}
+                <div class="message {{ 'sent' if message.sent else 'received' }}">
+                    <div class="message-content">
+                        <p>{{ message.text }}</p>
+                        <span class="message-time">{{ message.time }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="chat-input">
+                <button class="btn btn-icon">
+                    <i class="fas fa-paperclip"></i>
+                </button>
+                <input type="text" placeholder="Type your message..." class="form-control">
+                <button class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+            {% else %}
+            <div class="no-conversation">
+                <i class="fas fa-comments"></i>
+                <h3>Select a conversation</h3>
+                <p>Choose a conversation from the list to start messaging</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.messages-container {
+    padding: 2rem;
+    height: calc(100vh - 4rem);
+    display: flex;
+    flex-direction: column;
+}
+
+.messages-header {
+    margin-bottom: 2rem;
+}
+
+.messages-content {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 2rem;
+    height: calc(100% - 4rem);
+}
+
+.conversations-section {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.conversations-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.conversation-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.conversation-item:hover {
+    background: #f8f9fa;
+}
+
+.conversation-item.active {
+    background: #e3f2fd;
+}
+
+.conversation-avatar {
+    position: relative;
+    margin-right: 1rem;
+}
+
+.conversation-avatar img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.online-status {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    background: #4CAF50;
+    border: 2px solid white;
+    border-radius: 50%;
+}
+
+.conversation-info {
+    flex: 1;
+}
+
+.conversation-info h4 {
+    margin: 0 0 0.25rem 0;
+    color: #343a40;
+}
+
+.last-message {
+    margin: 0;
+    color: #6c757d;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.message-time {
+    font-size: 0.75rem;
+    color: #adb5bd;
+}
+
+.unread-badge {
+    background: #4CAF50;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.chat-section {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-user {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.chat-user img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-info h4 {
+    margin: 0 0 0.25rem 0;
+    color: #343a40;
+}
+
+.user-status {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.chat-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-icon {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    color: #6c757d;
+    border: none;
+    cursor: pointer;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.message {
+    max-width: 70%;
+    display: flex;
+    flex-direction: column;
+}
+
+.message.sent {
+    align-self: flex-end;
+}
+
+.message.received {
+    align-self: flex-start;
+}
+
+.message-content {
+    padding: 1rem;
+    border-radius: 8px;
+    position: relative;
+}
+
+.message.sent .message-content {
+    background: #e3f2fd;
+    color: #0d47a1;
+}
+
+.message.received .message-content {
+    background: #f8f9fa;
+    color: #343a40;
+}
+
+.message-time {
+    font-size: 0.75rem;
+    color: #adb5bd;
+    margin-top: 0.25rem;
+}
+
+.chat-input {
+    padding: 1.5rem;
+    border-top: 1px solid #e9ecef;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.chat-input .form-control {
+    flex: 1;
+}
+
+.no-conversation {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+}
+
+.no-conversation i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.no-conversation h3 {
+    margin: 0 0 0.5rem 0;
+    color: #343a40;
+}
+</style>
+{% endblock %} 
