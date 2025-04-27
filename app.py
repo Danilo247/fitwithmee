@@ -54,6 +54,10 @@ def load_user(user_id):
 
 def send_verification_email(email, token):
     try:
+        if not BREVO_API_KEY:
+            print("Error: BREVO_API_KEY is not set")
+            return False
+            
         email_data = {
             "sender": {"email": "okikidanielayo@gmail.com", "name": "Fit With COACH Daniel"},
             "to": [{"email": email}],
@@ -72,12 +76,14 @@ def send_verification_email(email, token):
                 </div>
             '''
         }
-        
-        if not BREVO_API_KEY:
-            print("Error: BREVO_API_KEY is not set")
-            return False
             
-        response = requests.post(f'{BREVO_API_URL}smtp/email', headers=HEADERS, data=json.dumps(email_data))
+        response = requests.post(
+            f'{BREVO_API_URL}smtp/email',
+            headers=HEADERS,
+            data=json.dumps(email_data),
+            timeout=10  # Add timeout to prevent hanging
+        )
+        
         print(f"Email API Response: {response.status_code} - {response.text}")
 
         if response.status_code == 201:
@@ -85,6 +91,10 @@ def send_verification_email(email, token):
         else:
             print(f"Failed to send email: {response.text}")
             return False
+    except requests.exceptions.RequestException as e:
+        print(f"Network error while sending email: {str(e)}")
+        traceback.print_exc()
+        return False
     except Exception as e:
         print(f"Error sending email: {str(e)}")
         traceback.print_exc()
@@ -262,53 +272,59 @@ def register():
         return redirect(url_for('dashboard'))
     
     if request.method == 'POST':
-        name = request.form.get('name')
-        email = request.form.get('email')
-        password = request.form.get('password')
-        confirm_password = request.form.get('confirm_password')
-
-        if not name or not email or not password or not confirm_password:
-            flash('All fields are required', 'error')
-            return redirect(url_for('register'))
-
-        if password != confirm_password:
-            flash('Passwords do not match', 'error')
-            return redirect(url_for('register'))
-
-        if User.query.filter_by(email=email).first():
-            flash('Email already registered', 'error')
-            return redirect(url_for('register'))
-
-        # Generate a random 8-digit token
-        token = ''.join([str(random.randint(0, 9)) for _ in range(8)])
-        
-        # Create new user
-        new_user = User(name=name, email=email)
-        new_user.set_password(password)
-        db.session.add(new_user)
-        
-        # Create verification token
-        verification_token = VerificationToken(token=token, email=email)
-        db.session.add(verification_token)
-        
         try:
-            db.session.commit()
+            name = request.form.get('name')
+            email = request.form.get('email')
+            password = request.form.get('password')
+            confirm_password = request.form.get('confirm_password')
+
+            if not name or not email or not password or not confirm_password:
+                flash('All fields are required', 'error')
+                return redirect(url_for('register'))
+
+            if password != confirm_password:
+                flash('Passwords do not match', 'error')
+                return redirect(url_for('register'))
+
+            if User.query.filter_by(email=email).first():
+                flash('Email already registered', 'error')
+                return redirect(url_for('register'))
+
+            # Generate a random 8-digit token
+            token = ''.join([str(random.randint(0, 9)) for _ in range(8)])
+            
+            # Create new user
+            new_user = User(name=name, email=email)
+            new_user.set_password(password)
+            db.session.add(new_user)
+            
+            # Create verification token
+            verification_token = VerificationToken(token=token, email=email)
+            db.session.add(verification_token)
+            
+            try:
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                print(f"Database error: {str(e)}")
+                traceback.print_exc()
+                flash('An error occurred while creating your account. Please try again.', 'error')
+                return redirect(url_for('register'))
             
             # Send verification email
             if send_verification_email(email, token):
                 flash('Registration successful! Please check your email for verification code.', 'success')
                 return render_template('verify_token.html', token=token)
             else:
-                flash('Registration successful but failed to send verification email. Please try again.', 'error')
-                return redirect(url_for('resend_verification'))
+                flash('Account created but failed to send verification email. Please contact support.', 'warning')
+                return render_template('verify_token.html', token=token)
                 
         except Exception as e:
-            db.session.rollback()
-            print(f"Registration error: {e}")
+            print(f"Registration error: {str(e)}")
             traceback.print_exc()
-            flash('An error occurred during registration. Please try again.', 'error')
+            flash('An unexpected error occurred. Please try again.', 'error')
             return redirect(url_for('register'))
-
+    
     return render_template('register.html')
 
 @app.route('/verify/<token>', methods=['GET', 'POST'])
