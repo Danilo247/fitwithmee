@@ -16,7 +16,7 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(256), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     verified = db.Column(db.Boolean, default=False)
-    role = db.Column(db.String(20), nullable=False, default=ROLE_CUSTOMER)
+    role = db.Column(db.String(20), server_default=ROLE_CUSTOMER)
     
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
