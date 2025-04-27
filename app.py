@@ -72,8 +72,13 @@ def send_verification_email(email, token):
                 </div>
             '''
         }
+        
+        if not BREVO_API_KEY:
+            print("Error: BREVO_API_KEY is not set")
+            return False
+            
         response = requests.post(f'{BREVO_API_URL}smtp/email', headers=HEADERS, data=json.dumps(email_data))
-        print(response.text)
+        print(f"Email API Response: {response.status_code} - {response.text}")
 
         if response.status_code == 201:
             return True
@@ -81,7 +86,8 @@ def send_verification_email(email, token):
             print(f"Failed to send email: {response.text}")
             return False
     except Exception as e:
-        print(f"Error sending email: {e}")
+        print(f"Error sending email: {str(e)}")
+        traceback.print_exc()
         return False
         
 
@@ -432,8 +438,35 @@ def not_found_error(error):
 
 # Initialize database tables
 def init_db():
-    with app.app_context():
-        db.create_all()
+    """Initialize the database with proper error handling."""
+    try:
+        with app.app_context():
+            # Create all tables
+            db.create_all()
+            
+            # Check if admin user exists, if not create one
+            admin_email = os.getenv('ADMIN_EMAIL')
+            admin_password = os.getenv('ADMIN_PASSWORD')
+            
+            if admin_email and admin_password:
+                admin = User.query.filter_by(email=admin_email, role=ROLE_ADMIN).first()
+                if not admin:
+                    admin = User(
+                        name='Admin',
+                        email=admin_email,
+                        role=ROLE_ADMIN,
+                        verified=True
+                    )
+                    admin.set_password(admin_password)
+                    db.session.add(admin)
+                    db.session.commit()
+                    print("Admin user created successfully")
+            
+            print("Database initialized successfully")
+    except Exception as e:
+        print(f"Error initializing database: {str(e)}")
+        traceback.print_exc()
+        raise
 
 # For local development
 if __name__ == '__main__':

@@ -35,6 +35,10 @@ class User(db.Model, UserMixin):
         }
     
     @property
+    def is_verified(self):
+        return self.verified
+    
+    @property
     def is_admin(self):
         return self.role == ROLE_ADMIN
     
