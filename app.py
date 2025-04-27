@@ -22,8 +22,12 @@ app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', secrets.token_hex(32))
 
 # Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///gym.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///gym.db').replace('postgres://', 'postgresql://')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'pool_pre_ping': True,
+    'pool_recycle': 300,
+}
 
 # Initialize extensions
 db.init_app(app)
@@ -304,9 +308,10 @@ def register():
             
             try:
                 db.session.commit()
+                print(f"Successfully created user: {email}")
             except Exception as e:
                 db.session.rollback()
-                print(f"Database error: {str(e)}")
+                print(f"Database error during registration: {str(e)}")
                 traceback.print_exc()
                 flash('An error occurred while creating your account. Please try again.', 'error')
                 return redirect(url_for('register'))
