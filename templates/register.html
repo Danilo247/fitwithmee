@@ -43,7 +43,7 @@
                     {% endif %}
                 {% endwith %}
                 
-                <form method="POST" action="{{ url_for('register') }}" class="auth-form" id="registerForm">
+                <form method="POST" action="{{ url_for('register') }}" class="auth-form" id="registerForm" onsubmit="return validateForm()">
                     <div class="form-group">
                         <label for="name">
                             <i class="fas fa-user"></i> Full Name
@@ -78,10 +78,10 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="confirmPassword">
+                        <label for="confirm_password">
                             <i class="fas fa-lock"></i> Confirm Password
                         </label>
-                        <input type="password" id="confirmPassword" name="confirmPassword" required 
+                        <input type="password" id="confirm_password" name="confirm_password" required 
                                minlength="8" placeholder="Confirm your password">
                     </div>
                     
@@ -98,7 +98,7 @@
                 </form>
                 
                 <div class="auth-footer">
-                    <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+                    <p>Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
                     <p><a href="{{ url_for('index') }}"><i class="fas fa-home"></i> Back to home</a></p>
                 </div>
             </div>
@@ -138,16 +138,24 @@
             }
         }
 
-        // Password confirmation validation
-        const confirmPassword = document.getElementById('confirmPassword');
-        const form = document.getElementById('registerForm');
-
-        form.addEventListener('submit', function(e) {
-            if (password.value !== confirmPassword.value) {
-                e.preventDefault();
-                alert('Passwords do not match!');
+        function validateForm() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            
+            if (!name || !email || !password || !confirmPassword) {
+                alert('Please fill in all fields');
+                return false;
             }
-        });
+            
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return false;
+            }
+            
+            return true;
+        }
     </script>
 </body>
 </html>
