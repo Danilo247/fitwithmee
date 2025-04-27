@@ -7,47 +7,81 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='responsive.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
     <div class="dashboard-container">
         <!-- Mobile Navigation Toggle -->
-        <button class="nav-toggle" id="navToggle">
-            <i class="fas fa-bars"></i>
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation menu" aria-expanded="false">
+            <i class="fas fa-bars" aria-hidden="true"></i>
         </button>
 
         <!-- Sidebar Navigation -->
-        <aside class="sidebar" id="sidebar">
+        <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
             <div class="sidebar-header">
-                <h3><i class="fas fa-dumbbell"></i> FitWithMe</h3>
+                <h3><i class="fas fa-dumbbell" aria-hidden="true"></i> FitWithMe</h3>
             </div>
             
-            <nav class="sidebar-nav">
+            <nav class="sidebar-nav" aria-label="Dashboard navigation">
                 <ul>
-                    <li class="active"><a href="#"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
-                    <li><a href="#profile"><i class="fas fa-user"></i> <span>Profile</span></a></li>
-                    <li><a href="#workouts"><i class="fas fa-running"></i> <span>Workouts</span></a></li>
-                    <li><a href="#progress"><i class="fas fa-chart-line"></i> <span>Progress</span></a></li>
-                    <li><a href="#nutrition"><i class="fas fa-apple-alt"></i> <span>Nutrition</span></a></li>
-                    <li><a href="#messages"><i class="fas fa-envelope"></i> <span>Messages</span></a></li>
-                    <li><a href="#settings"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
-                    <li><a href="#users"><i class="fas fa-users"></i> <span>Community</span></a></li>
+                    <li class="active">
+                        <a href="{{ url_for('dashboard') }}" aria-current="page">
+                            <i class="fas fa-home" aria-hidden="true"></i> 
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('profile') }}">
+                            <i class="fas fa-user" aria-hidden="true"></i> 
+                            <span>Profile</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('workouts') }}">
+                            <i class="fas fa-dumbbell" aria-hidden="true"></i> 
+                            <span>Workouts</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('progress') }}">
+                            <i class="fas fa-chart-line" aria-hidden="true"></i> 
+                            <span>Progress</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('messages') }}">
+                            <i class="fas fa-envelope" aria-hidden="true"></i> 
+                            <span>Messages</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('settings') }}">
+                            <i class="fas fa-cog" aria-hidden="true"></i> 
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('community') }}">
+                            <i class="fas fa-users" aria-hidden="true"></i> 
+                            <span>Community</span>
+                        </a>
+                    </li>
                 </ul>
             </nav>
             
             <div class="sidebar-footer">
-                <a href="{{ url_for('logout') }}" class="btn btn-secondary">
-                    <i class="fas fa-sign-out-alt"></i>
+                <a href="{{ url_for('logout') }}" class="btn btn-secondary" role="button">
+                    <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
                     <span>Logout</span>
                 </a>
             </div>
         </aside>
         
         <!-- Main Content Area -->
-        <main class="main-content">
+        <main class="main-content" role="main">
             <header class="main-header">
                 <div class="header-left">
-                    <h2>Welcome Back, {{ user.name }}! <i class="fas fa-hand-wave"></i></h2>
+                    <h2>Welcome Back, {{ user.name }}! <i class="fas fa-hand-wave" aria-hidden="true"></i></h2>
                     <p>Track your fitness journey and achieve your goals</p>
                 </div>
                 <div class="header-right">
@@ -60,9 +94,9 @@
             
             <div class="content-wrapper">
                 <!-- Stats Cards -->
-                <div class="stats-grid">
+                <div class="stats-grid" role="region" aria-label="User statistics">
                     <div class="stat-card">
-                        <div class="stat-icon bg-primary">
+                        <div class="stat-icon bg-primary" aria-hidden="true">
                             <i class="fas fa-dumbbell"></i>
                         </div>
                         <div class="stat-info">
@@ -72,7 +106,7 @@
                     </div>
                     
                     <div class="stat-card">
-                        <div class="stat-icon bg-success">
+                        <div class="stat-icon bg-success" aria-hidden="true">
                             <i class="fas fa-fire"></i>
                         </div>
                         <div class="stat-info">
@@ -82,8 +116,8 @@
                     </div>
                     
                     <div class="stat-card">
-                        <div class="stat-icon bg-warning">
-                            <i class="fas fa-stopwatch"></i>
+                        <div class="stat-icon bg-warning" aria-hidden="true">
+                            <i class="fas fa-clock"></i>
                         </div>
                         <div class="stat-info">
                             <h3>Active Minutes</h3>
@@ -92,7 +126,7 @@
                     </div>
                     
                     <div class="stat-card">
-                        <div class="stat-icon bg-info">
+                        <div class="stat-icon bg-info" aria-hidden="true">
                             <i class="fas fa-medal"></i>
                         </div>
                         <div class="stat-info">
@@ -103,11 +137,11 @@
                 </div>
                 
                 <!-- User Data Table -->
-                <div class="data-section">
+                <div class="data-section" role="region" aria-label="User information">
                     <div class="section-header">
-                        <h3><i class="fas fa-user-circle"></i> User Information</h3>
-                        <button class="btn btn-primary btn-sm">
-                            <i class="fas fa-download"></i> Export Data
+                        <h3><i class="fas fa-user-circle" aria-hidden="true"></i> User Information</h3>
+                        <button class="btn btn-primary btn-sm" aria-label="Export user data">
+                            <i class="fas fa-download" aria-hidden="true"></i> Export Data
                         </button>
                     </div>
                     
@@ -115,12 +149,12 @@
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Status</th>
-                                    <th>Joined</th>
-                                    <th>Actions</th>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Joined</th>
+                                    <th scope="col">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -130,15 +164,15 @@
                                     <td data-label="Email">{{ user.email }}</td>
                                     <td data-label="Status">
                                         {% if user.verified %}
-                                            <span class="status-badge status-active">Active</span>
+                                            <span class="status-badge status-active" role="status">Active</span>
                                         {% else %}
-                                            <span class="status-badge status-pending">Pending</span>
+                                            <span class="status-badge status-pending" role="status">Pending</span>
                                         {% endif %}
                                     </td>
                                     <td data-label="Joined">{{ user.formatted_created_at }}</td>
                                     <td data-label="Actions">
-                                        <button class="btn btn-primary btn-sm">
-                                            <i class="fas fa-edit"></i> Edit
+                                        <button class="btn btn-primary btn-sm" aria-label="Edit user information">
+                                            <i class="fas fa-edit" aria-hidden="true"></i> Edit
                                         </button>
                                     </td>
                                 </tr>
@@ -148,15 +182,15 @@
                 </div>
                 
                 <!-- Recent Activity -->
-                <div class="data-section">
+                <div class="data-section" role="region" aria-label="Recent activity">
                     <div class="section-header">
-                        <h3><i class="fas fa-history"></i> Recent Activity</h3>
+                        <h3><i class="fas fa-history" aria-hidden="true"></i> Recent Activity</h3>
                     </div>
                     
                     <div class="activity-list">
                         {% for activity in activities %}
                         <div class="activity-item">
-                            <div class="activity-icon">
+                            <div class="activity-icon" aria-hidden="true">
                                 {% if activity.type == 'account_creation' %}
                                     <i class="fas fa-user-plus"></i>
                                 {% elif activity.type == 'verification' %}
@@ -184,6 +218,8 @@
             const sidebar = document.getElementById('sidebar');
             
             navToggle.addEventListener('click', function() {
+                const isExpanded = this.getAttribute('aria-expanded') === 'true';
+                this.setAttribute('aria-expanded', !isExpanded);
                 sidebar.classList.toggle('active');
                 navToggle.classList.toggle('active');
             });
@@ -212,6 +248,7 @@
                     if (window.innerWidth < 768) {
                         sidebar.classList.remove('active');
                         navToggle.classList.remove('active');
+                        navToggle.setAttribute('aria-expanded', 'false');
                     }
                 });
             });
@@ -227,6 +264,7 @@
                 if (window.innerWidth >= 768) {
                     sidebar.classList.remove('active');
                     navToggle.classList.remove('active');
+                    navToggle.setAttribute('aria-expanded', 'false');
                 }
             });
         });

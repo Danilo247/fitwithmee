@@ -441,6 +441,112 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
+@app.route('/dashboard/profile')
+@login_required
+def profile():
+    try:
+        user = current_user
+        user_dict = user.to_dict()
+        return render_template('profile.html', user=user_dict)
+    except Exception as e:
+        print(f"Profile error: {e}")
+        traceback.print_exc()
+        flash('An error occurred while loading your profile.')
+        return redirect(url_for('dashboard'))
+
+@app.route('/dashboard/workouts')
+@login_required
+def workouts():
+    try:
+        user = current_user
+        # TODO: Add actual workout data
+        current_plan = {
+            'workouts_per_week': 3,
+            'duration': 12,
+            'progress': 25
+        }
+        stats = {
+            'total_time': 15,
+            'total_calories': 2500,
+            'total_workouts': 12,
+            'total_achievements': 3
+        }
+        return render_template('workouts.html', current_plan=current_plan, stats=stats)
+    except Exception as e:
+        print(f"Workouts error: {e}")
+        traceback.print_exc()
+        flash('An error occurred while loading workouts.')
+        return redirect(url_for('dashboard'))
+
+@app.route('/dashboard/progress')
+@login_required
+def progress():
+    try:
+        user = current_user
+        # TODO: Add actual progress data
+        progress = {
+            'current_weight': 75,
+            'weight_trend': 'down',
+            'weight_change': 2.5
+        }
+        return render_template('progress.html', progress=progress)
+    except Exception as e:
+        print(f"Progress error: {e}")
+        traceback.print_exc()
+        flash('An error occurred while loading progress.')
+        return redirect(url_for('dashboard'))
+
+@app.route('/dashboard/messages')
+@login_required
+def messages():
+    try:
+        user = current_user
+        # TODO: Add actual messages data
+        conversations = []
+        current_conversation = None
+        return render_template('messages.html', conversations=conversations, current_conversation=current_conversation)
+    except Exception as e:
+        print(f"Messages error: {e}")
+        traceback.print_exc()
+        flash('An error occurred while loading messages.')
+        return redirect(url_for('dashboard'))
+
+@app.route('/dashboard/community')
+@login_required
+def community():
+    try:
+        user = current_user
+        # TODO: Add actual community data
+        stats = {
+            'total_members': 100,
+            'active_today': 25,
+            'total_posts': 50
+        }
+        return render_template('community.html', stats=stats)
+    except Exception as e:
+        print(f"Community error: {e}")
+        traceback.print_exc()
+        flash('An error occurred while loading community.')
+        return redirect(url_for('dashboard'))
+
+@app.route('/dashboard/settings')
+@login_required
+def settings():
+    try:
+        user = current_user
+        # TODO: Add actual settings data
+        notifications = {
+            'push_workouts': True,
+            'push_progress': True,
+            'push_messages': False
+        }
+        return render_template('settings.html', user=user, notifications=notifications)
+    except Exception as e:
+        print(f"Settings error: {e}")
+        traceback.print_exc()
+        flash('An error occurred while loading settings.')
+        return redirect(url_for('dashboard'))
+
 def init_db():
     """Initialize the database with proper error handling."""
     try:
