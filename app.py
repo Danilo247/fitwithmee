@@ -441,24 +441,14 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-# Error handlers
-@app.errorhandler(500)
-def internal_error(error):
-    print(f"Internal server error: {error}")
-    traceback.print_exc()
-    return render_template('error.html', error="Internal Server Error"), 500
-
-@app.errorhandler(404)
-def not_found_error(error):
-    return render_template('error.html', error="Page Not Found"), 404
-
-# Initialize database tables
 def init_db():
     """Initialize the database with proper error handling."""
     try:
         with app.app_context():
+            print("Initializing database...")
             # Create all tables
             db.create_all()
+            print("Database tables created successfully")
             
             # Check if admin user exists, if not create one
             admin_email = os.getenv('ADMIN_EMAIL')
@@ -484,7 +474,20 @@ def init_db():
         traceback.print_exc()
         raise
 
+# Error handlers
+@app.errorhandler(500)
+def internal_error(error):
+    print(f"Internal server error: {error}")
+    traceback.print_exc()
+    return render_template('error.html', error="Internal Server Error"), 500
+
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('error.html', error="Page Not Found"), 404
+
+# Initialize database tables
+init_db()
+
 # For local development
 if __name__ == '__main__':
-    init_db()
     app.run(debug=True)
